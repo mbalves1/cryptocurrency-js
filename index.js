@@ -61,5 +61,33 @@ class Blockchain {
   isChainValid(chain) {
     let previousBlock = chain[0]
     let blockIndex = 1
+
+    while(blockIndex < chain.length) {
+      const currentBlock = chain[blockIndex]
+      if (currentBlock.previousBlock !== this.hash(previousBlock)) {
+        return false
+      }
+
+      const previousProof = previousBlock.proof
+      const currentProof = currentBlock.proof
+      const hashOperation = crypto.createHash('sha256').update(`${currentProof**2 - previousProof**2}`).digest('hex')
+      if (hashOperation.substring(0, 4) !== '0000') {
+        return false
+      }
+      previousBlock = currentBlock
+      blockIndex++
+    }
+    return true
   }
+
+  addTransaction(sender, receiver, amount) {
+    this.transactions.push({ sender, receiver, amount })
+    const previousBlock = this.getPreviousBlock()
+    return previousBlock.index + 1
+  }
+
+  addNode(address) {
+    const parsedUrl = new URL(address)
+  }
+
 }
